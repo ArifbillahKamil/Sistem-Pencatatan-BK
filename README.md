@@ -1,66 +1,190 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-# Sistem-Pencatatan-BK
-=======
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📚 Sistem Manajemen Pelanggaran dan Poin Siswa
+### SMPN 16 Gresik
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web berbasis Laravel untuk membantu Guru BK (Bimbingan Konseling) dalam mencatat dan mengelola pelanggaran siswa secara digital, dilengkapi dengan sistem poin otomatis dan penerbitan Surat Peringatan (SP) secara otomatis.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🧰 Teknologi yang Digunakan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Teknologi | Versi |
+|-----------|-------|
+| PHP | >= 8.2 |
+| Laravel | 13.x |
+| MySQL | 8.0 |
+| Tailwind CSS | via CDN |
+| Laravel Breeze | (dimodifikasi — login pakai `username`) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## ✨ Fitur Utama
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👤 Guru BK (Admin)
+- **Dashboard** — statistik sistem: total siswa, pelanggaran hari ini, jumlah SP aktif
+- **Manajemen Kelas** — tambah, edit, hapus data kelas beserta wali kelas
+- **Manajemen Siswa** — CRUD data siswa, pencarian, filter per kelas, rekap pelanggaran per siswa
+- **Jenis Pelanggaran** — kelola kategori (ringan / sedang / berat) dan bobot poin
+- **Transaksi Pelanggaran** — catat pelanggaran siswa; poin diperbarui **otomatis**
+- **Log Peringatan (SP)** — riwayat surat peringatan dengan timeline visual; SP diterbitkan **otomatis**
+- **Manajemen User** — tambah dan kelola akun Guru BK maupun Wali Kelas
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 👩‍🏫 Wali Kelas (Read-only)
+- **Dashboard** — ringkasan kelas yang diampu
+- **Daftar Siswa** — lihat data siswa beserta total poin dan status SP
+- **Riwayat Pelanggaran** — pantau catatan pelanggaran siswa di kelas sendiri
+- **Status SP** — monitor surat peringatan aktif untuk siswa di kelasnya
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## ⚙️ Logika SP Otomatis
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Setiap kali pelanggaran dicatat atau dihapus, sistem akan:
+1. Menghitung ulang **total poin** siswa dari seluruh transaksi
+2. Memeriksa ambang batas dan menerbitkan SP secara otomatis:
+
+| Ambang Batas | Surat Peringatan |
+|:---:|:---:|
+| ≥ 25 poin | **SP1** |
+| ≥ 50 poin | **SP2** |
+| ≥ 75 poin | **SP3** |
+
+> Setiap level SP hanya diterbitkan **satu kali**. Jika poin turun di bawah ambang (misal setelah data dihapus), SP terkait otomatis ditandai **selesai**.
+
+---
+
+## 🚀 Cara Instalasi
+
+### Prasyarat
+- PHP >= 8.2
+- Composer
+- MySQL (Laragon / XAMPP)
+- Git
+
+### Langkah-langkah
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clone repositori
+git clone https://github.com/ArifbillahKamil/Sistem-Pencatatan-BK.git
+cd Sistem-Pencatatan-BK
 
-php artisan boost:install
+# 2. Install dependensi PHP
+composer install
+
+# 3. Salin file environment
+cp .env.example .env
+
+# 4. Generate application key
+php artisan key:generate
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Konfigurasi Database
 
-## Contributing
+Edit file `.env` sesuai konfigurasi MySQL kamu:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sistem_bk
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Code of Conduct
+> Buat database `sistem_bk` terlebih dahulu di MySQL/phpMyAdmin.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# 5. Jalankan migrasi dan seeder
+php artisan migrate --seed
 
-## Security Vulnerabilities
+# 6. Jalankan server lokal
+php artisan serve
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Buka browser dan akses: **http://127.0.0.1:8000**
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
->>>>>>> d9db096 (step 1 & 2)
-=======
-# Sistem-Pencatatan-BK
->>>>>>> 385e2fe169e65cf2caa6366dc351bcb2dd04bb27
+## 🔑 Akun Default (Seeder)
+
+| Role | Username | Password |
+|------|----------|----------|
+| Guru BK | `gurubk` | `password` |
+| Wali Kelas | `walikelas` | `password` |
+
+---
+
+## 🗄️ Struktur Database
+
+```
+users               — akun pengguna (guru_bk / wali_kelas)
+kelas               — data kelas dengan relasi ke wali kelas
+siswa               — data siswa dengan total_poin
+jenis_pelanggaran   — master jenis pelanggaran & bobot poin
+transaksi_pelanggaran — catatan pelanggaran per siswa
+log_peringatan      — riwayat surat peringatan (SP1 / SP2 / SP3)
+```
+
+---
+
+## 📁 Struktur Direktori Penting
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── DashboardController.php
+│   │   ├── KelasController.php
+│   │   ├── SiswaController.php
+│   │   ├── JenisPelanggaranController.php
+│   │   ├── TransaksiPelanggaranController.php   ← inti sistem
+│   │   ├── LogPeringatanController.php
+│   │   ├── UserController.php
+│   │   └── WaliKelasController.php
+│   └── Middleware/
+│       └── CheckRole.php                        ← role-based access
+├── Models/
+│   ├── Siswa.php
+│   ├── Kelas.php
+│   ├── JenisPelanggaran.php
+│   ├── TransaksiPelanggaran.php
+│   └── LogPeringatan.php
+resources/views/
+├── layouts/app.blade.php                        ← sidebar + navbar
+├── dashboard/{guru_bk,wali_kelas}.blade.php
+├── kelas/         siswa/         jenis-pelanggaran/
+├── transaksi/     log-peringatan/    users/     wali/
+routes/web.php                                   ← semua route
+database/seeders/DatabaseSeeder.php              ← data awal
+```
+
+---
+
+## 🔒 Hak Akses per Role
+
+| Fitur | Guru BK | Wali Kelas |
+|-------|:-------:|:----------:|
+| Dashboard sistem | ✅ | ✅ (kelas sendiri) |
+| CRUD Kelas | ✅ | ❌ |
+| CRUD Siswa | ✅ | 👁️ baca |
+| CRUD Jenis Pelanggaran | ✅ | ❌ |
+| Catat / Edit Pelanggaran | ✅ | ❌ |
+| Lihat Riwayat Pelanggaran | ✅ | 👁️ (kelas sendiri) |
+| Log Peringatan + Toggle SP | ✅ | 👁️ (kelas sendiri) |
+| Manajemen User | ✅ | ❌ |
+
+---
+
+## 🔄 Reset Data
+
+Jika ingin mengulang data dari awal:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## 👨‍💻 Dikembangkan oleh
+
+**Arifbillah Kamil** — Kerja Praktik SMPN 16 Gresik  
+Framework: [Laravel](https://laravel.com) · UI: [Tailwind CSS](https://tailwindcss.com)
