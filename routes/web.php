@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
         // Log Peringatan (Step 12)
         Route::get('/log-peringatan', [\App\Http\Controllers\LogPeringatanController::class, 'index'])->name('log-peringatan.index');
         Route::get('/log-peringatan/{siswa}', [\App\Http\Controllers\LogPeringatanController::class, 'show'])->name('log-peringatan.show');
+        Route::post('/log-peringatan/{log}/toggle', [\App\Http\Controllers\LogPeringatanController::class, 'toggleStatus'])->name('log-peringatan.toggle');
 
     });
 
