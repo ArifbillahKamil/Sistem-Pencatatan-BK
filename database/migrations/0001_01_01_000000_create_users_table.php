@@ -16,7 +16,9 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->string('password');
             $table->string('nama_lengkap');
-            $table->enum('role', ['guru_bk', 'wali_kelas']);
+            // Menggunakan string() agar kompatibel dengan SQLite saat testing.
+            // MySQL menggunakan ENUM via migration terpisah (add_guru_wali_to_users_table).
+            $table->string('role')->default('guru_bk');
             $table->timestamps();
         });
 

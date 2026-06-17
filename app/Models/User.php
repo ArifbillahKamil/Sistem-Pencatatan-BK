@@ -38,4 +38,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(TransaksiPelanggaran::class, 'id_user_pelapor');
     }
+
+    public function guruWaliSiswa()
+    {
+        return $this->hasMany(GuruWaliSiswa::class, 'id_user');
+    }
 }

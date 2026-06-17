@@ -60,6 +60,10 @@
                     </td>
                     <td class="px-5 py-3.5 text-center">
                         <div class="flex items-center justify-center gap-2">
+                            <a href="{{ route('pdf.kelas', $k->id_kelas) }}" target="_blank"
+                               class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition">
+                                📄 Export PDF
+                            </a>
                             <a href="{{ route('kelas.edit', $k->id_kelas) }}"
                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

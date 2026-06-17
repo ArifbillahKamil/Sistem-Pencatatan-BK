@@ -21,17 +21,27 @@
         <form action="{{ route('transaksi.update', $transaksi->id_transaksi) }}" method="POST" class="space-y-5">
             @csrf @method('PUT')
 
-            <div>
-                <label for="id_siswa" class="block text-sm font-medium text-slate-700 mb-1.5">Siswa <span class="text-red-500">*</span></label>
-                <select id="id_siswa" name="id_siswa"
-                        class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white
-                               {{ $errors->has('id_siswa') ? 'border-red-400 bg-red-50' : 'border-slate-300' }}">
-                    @foreach($siswaList as $s)
-                    <option value="{{ $s->id_siswa }}" {{ old('id_siswa', $transaksi->id_siswa) == $s->id_siswa ? 'selected' : '' }}>
-                        {{ $s->nama_siswa }} — {{ $s->kelas->nama_kelas ?? '-' }} ({{ $s->total_poin }} poin)
-                    </option>
-                    @endforeach
-                </select>
+            <div class="relative">
+                <label for="search_siswa" class="block text-sm font-medium text-slate-700 mb-1.5">Siswa <span class="text-red-500">*</span></label>
+                <input type="hidden" id="id_siswa" name="id_siswa" value="{{ old('id_siswa', $transaksi->id_siswa) }}">
+                
+                @php
+                    $oldSiswaId = old('id_siswa', $transaksi->id_siswa);
+                    $oldSiswaName = '';
+                    if($oldSiswaId) {
+                        $oldSiswa = \App\Models\Siswa::with('kelas')->find($oldSiswaId);
+                        if($oldSiswa) {
+                            $oldSiswaName = $oldSiswa->nama_siswa . ' — ' . ($oldSiswa->kelas->nama_kelas ?? '-') . ' (' . $oldSiswa->total_poin . ' poin)';
+                        }
+                    }
+                @endphp
+                <input type="text" id="search_siswa" placeholder="Ketik nama atau NISN siswa..." autocomplete="off" value="{{ $oldSiswaName }}"
+                       class="w-full px-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white
+                              {{ $errors->has('id_siswa') ? 'border-red-400 bg-red-50' : 'border-slate-300' }}">
+                
+                <ul id="search_siswa_results" class="absolute z-10 w-full bg-white border border-slate-200 shadow-lg rounded-xl mt-1 hidden max-h-60 overflow-y-auto divide-y divide-slate-100">
+                    <!-- Results will be injected here -->
+                </ul>
                 @error('id_siswa') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
@@ -102,5 +112,77 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('search_siswa');
+        const hiddenInput = document.getElementById('id_siswa');
+        const resultsContainer = document.getElementById('search_siswa_results');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            const query = e.target.value;
+            
+            // Clear hidden input when user modifies text
+            hiddenInput.value = '';
+
+            if (query.trim().length === 0) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                resultsContainer.innerHTML = '<li class="px-4 py-3 text-sm text-slate-500 text-center">Memuat...</li>';
+                resultsContainer.classList.remove('hidden');
+                
+                fetch(`{{ route('transaksi.searchSiswa') }}?q=${encodeURIComponent(query)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+                    if(data.length === 0) {
+                        resultsContainer.innerHTML = '<li class="px-4 py-3 text-sm text-slate-500 text-center">Tidak ditemukan</li>';
+                        return;
+                    }
+                    
+                    data.forEach(siswa => {
+                        const li = document.createElement('li');
+                        li.className = 'px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer transition';
+                        li.innerHTML = `
+                            <div class="font-medium text-slate-900">${siswa.nama_siswa}</div>
+                            <div class="text-xs text-slate-500 mt-0.5">NISN: ${siswa.nisn} — Kelas: ${siswa.nama_kelas} — Poin: <span class="${siswa.total_poin > 40 ? 'text-red-500 font-bold' : 'text-amber-500 font-semibold'}">${siswa.total_poin}</span></div>
+                        `;
+                        
+                        li.addEventListener('click', () => {
+                            searchInput.value = `${siswa.nama_siswa} — ${siswa.nama_kelas} (${siswa.total_poin} poin)`;
+                            hiddenInput.value = siswa.id_siswa;
+                            resultsContainer.classList.add('hidden');
+                        });
+                        
+                        resultsContainer.appendChild(li);
+                    });
+                })
+                .catch(err => {
+                    resultsContainer.innerHTML = '<li class="px-4 py-3 text-sm text-red-500 text-center">Gagal memuat data</li>';
+                    console.error(err);
+                });
+            }, 300);
+        });
+
+        // Hide results on outside click
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    });
+</script>
+@endpush
 
 @endsection

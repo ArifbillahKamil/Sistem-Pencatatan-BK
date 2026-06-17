@@ -57,6 +57,27 @@ class TransaksiPelanggaranController extends Controller
         return view('transaksi.create', compact('siswaList', 'jenisList'));
     }
 
+    public function searchSiswa(Request $request)
+    {
+        $queryStr = $request->input('q');
+        $siswa = Siswa::with('kelas')
+            ->where('nama_siswa', 'like', "%{$queryStr}%")
+            ->orWhere('nisn', 'like', "%{$queryStr}%")
+            ->limit(20)
+            ->get()
+            ->map(function($s) {
+                return [
+                    'id_siswa' => $s->id_siswa,
+                    'nama_siswa' => $s->nama_siswa,
+                    'nisn' => $s->nisn,
+                    'nama_kelas' => $s->kelas->nama_kelas ?? '-',
+                    'total_poin' => $s->total_poin,
+                ];
+            });
+
+        return response()->json($siswa);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

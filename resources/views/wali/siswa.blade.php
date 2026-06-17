@@ -41,6 +41,8 @@
                 @foreach($siswa as $i => $s)
                 @php
                     $poin = $s->total_poin;
+                    $poinTahunIni = $s->getTotalPoinTahunIni();
+                    $predikat = \App\Helpers\AcademicYearHelper::getPredikat($poinTahunIni);
                     $poinColor = $poin > 60 ? 'text-rose-600 font-bold' : ($poin > 40 ? 'text-red-500 font-semibold' : ($poin > 20 ? 'text-amber-500 font-semibold' : 'text-slate-700'));
                     $sp = $s->level_sp_aktif;
                     $spBadge = match($sp) { 'SP3' => 'bg-rose-100 text-rose-700', 'SP2' => 'bg-red-100 text-red-600', 'SP1' => 'bg-amber-100 text-amber-700', default => 'bg-slate-100 text-slate-500' };
@@ -55,7 +57,14 @@
                         </span>
                     </td>
                     <td class="px-5 py-3.5 text-slate-600">{{ $s->tanggal_lahir?->format('d M Y') ?? '-' }}</td>
-                    <td class="px-5 py-3.5 text-center {{ $poinColor }}">{{ $poin }}</td>
+                    <td class="px-5 py-3.5 text-center">
+                        <span class="{{ $poinColor }}">{{ $poin }}</span>
+                        <div class="mt-1">
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-{{ $predikat['color'] }}-100 text-{{ $predikat['color'] }}-800">
+                                {{ $predikat['label'] }}
+                            </span>
+                        </div>
+                    </td>
                     <td class="px-5 py-3.5 text-center">
                         <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium {{ $spBadge }}">
                             {{ $sp ?? 'Aman' }}

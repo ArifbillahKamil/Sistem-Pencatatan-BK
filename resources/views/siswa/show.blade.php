@@ -5,16 +5,22 @@
 @section('content')
 
 {{-- Header --}}
-<div class="mb-6 flex items-center gap-3">
-    <a href="{{ route('siswa.index') }}" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-    </a>
-    <div>
-        <h1 class="text-2xl font-bold text-slate-800">Rekap Pelanggaran</h1>
-        <p class="text-slate-500 text-sm">{{ $siswa->nama_siswa }} — {{ $siswa->kelas->nama_kelas ?? '-' }}</p>
+<div class="mb-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+        <a href="{{ route('siswa.index') }}" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+        </a>
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Rekap Pelanggaran</h1>
+            <p class="text-slate-500 text-sm">{{ $siswa->nama_siswa }} — {{ $siswa->kelas->nama_kelas ?? '-' }}</p>
+        </div>
     </div>
+    <a href="{{ route('pdf.siswa', $siswa->id_siswa) }}" target="_blank"
+       class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition shadow-sm">
+        📄 Export PDF
+    </a>
 </div>
 
 {{-- Info Card --}}
@@ -27,9 +33,16 @@
         <p class="text-xs text-slate-500 mb-1">Total Poin Pelanggaran</p>
         @php
             $poin = $siswa->total_poin;
+            $poinTahunIni = $siswa->getTotalPoinTahunIni();
+            $predikat = \App\Helpers\AcademicYearHelper::getPredikat($poinTahunIni);
             $poinColor = $poin > 60 ? 'text-rose-600' : ($poin > 40 ? 'text-red-500' : ($poin > 20 ? 'text-amber-500' : 'text-slate-800'));
         @endphp
-        <p class="text-2xl font-bold {{ $poinColor }}">{{ $poin }} <span class="text-sm font-normal text-slate-400">poin</span></p>
+        <div class="flex items-center gap-3">
+            <p class="text-2xl font-bold {{ $poinColor }}">{{ $poin }} <span class="text-sm font-normal text-slate-400">poin</span></p>
+            <span class="inline-block px-2.5 py-1 rounded text-xs font-semibold bg-{{ $predikat['color'] }}-100 text-{{ $predikat['color'] }}-800">
+                {{ $predikat['label'] }}
+            </span>
+        </div>
     </div>
     <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
         <p class="text-xs text-slate-500 mb-1">Status SP Aktif</p>

@@ -54,9 +54,24 @@ class Siswa extends Model
     public function getLevelSpAktifAttribute(): ?string
     {
         $sp = $this->logPeringatanAktif()
-                   ->orderByRaw("FIELD(status_sp, 'SP3', 'SP2', 'SP1')")
+                   ->orderByRaw("CASE status_sp WHEN 'SP3' THEN 1 WHEN 'SP2' THEN 2 WHEN 'SP1' THEN 3 ELSE 4 END")
                    ->first();
 
         return $sp?->status_sp;
+    }
+
+    public function guruWali()
+    {
+        return $this->hasOne(GuruWaliSiswa::class, 'id_siswa', 'id_siswa');
+    }
+
+    public function getTotalPoinTahunIni(): int
+    {
+        $dateRange = \App\Helpers\AcademicYearHelper::getAcademicYearDateRange();
+
+        return $this->transaksiPelanggaran()
+            ->whereBetween('tanggal_kejadian', [$dateRange['start'], $dateRange['end']])
+            ->join('jenis_pelanggaran', 'transaksi_pelanggaran.id_jenis', '=', 'jenis_pelanggaran.id_jenis')
+            ->sum('jenis_pelanggaran.bobot_poin');
     }
 }

@@ -4,6 +4,9 @@
 
 @section('content')
 
+{{-- Hero Banner --}}
+<x-school-header size="lg" />
+
 {{-- Page Header --}}
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-800">Dashboard</h1>

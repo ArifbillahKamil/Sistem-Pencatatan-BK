@@ -32,6 +32,14 @@ class DatabaseSeeder extends Seeder
             'role'         => 'wali_kelas',
         ]);
 
+        // ─── 2.5 Guru Wali ────────────────────────────────────────────
+        $guruwali = User::create([
+            'username'     => 'guruwali',
+            'password'     => Hash::make('password'),
+            'nama_lengkap' => 'Guru Wali 1',
+            'role'         => 'guru_wali',
+        ]);
+
         // ─── 3. Kelas (linked to wali_kelas) ─────────────────────────
         $kelas = Kelas::create([
             'id_user'    => $walikelas->id,
