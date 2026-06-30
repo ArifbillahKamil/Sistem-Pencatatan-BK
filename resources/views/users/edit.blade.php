@@ -52,6 +52,7 @@
                                {{ $errors->has('role') ? 'border-red-400 bg-red-50' : 'border-slate-300' }}">
                     <option value="guru_bk"    {{ old('role', $user->role) === 'guru_bk'    ? 'selected' : '' }}>Guru BK</option>
                     <option value="wali_kelas" {{ old('role', $user->role) === 'wali_kelas' ? 'selected' : '' }}>Wali Kelas</option>
+                    <option value="guru_wali" {{ old('role', $user->role) === 'guru_wali' ? 'selected' : '' }}>Guru Wali</option>
                 </select>
                 @error('role') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>

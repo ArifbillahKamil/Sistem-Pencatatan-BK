@@ -53,6 +53,7 @@
                     <option value="">-- Pilih Role --</option>
                     <option value="guru_bk" {{ old('role') === 'guru_bk' ? 'selected' : '' }}>Guru BK</option>
                     <option value="wali_kelas" {{ old('role') === 'wali_kelas' ? 'selected' : '' }}>Wali Kelas</option>
+                    <option value="guru_wali" {{ old('role') === 'guru_wali' ? 'selected' : '' }}>Guru Wali</option>
                 </select>
                 @error('role') <p class="mt-1.5 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>

@@ -25,7 +25,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'username'     => 'required|string|max:50|unique:users,username',
             'nama_lengkap' => 'required|string|max:100',
-            'role'         => 'required|in:guru_bk,wali_kelas',
+            'role'         => 'required|in:guru_bk,wali_kelas,guru_wali',
             'password'     => ['required', 'confirmed', Password::min(6)],
         ], [
             'username.required'     => 'Username wajib diisi.',
@@ -63,7 +63,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'username'     => 'required|string|max:50|unique:users,username,' . $user->id,
             'nama_lengkap' => 'required|string|max:100',
-            'role'         => 'required|in:guru_bk,wali_kelas',
+            'role'         => 'required|in:guru_bk,wali_kelas,guru_wali',
             'password'     => ['nullable', 'confirmed', Password::min(6)],
         ], [
             'username.required'     => 'Username wajib diisi.',

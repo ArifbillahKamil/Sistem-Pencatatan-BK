@@ -18,6 +18,8 @@ class DashboardController extends Controller
 
         if ($user->role === 'guru_bk') {
             return $this->dashboardGuruBk();
+        } elseif ($user->role === 'guru_wali') {
+            return redirect()->route('guru_wali.dashboard');
         }
 
         return $this->dashboardWaliKelas($user);
